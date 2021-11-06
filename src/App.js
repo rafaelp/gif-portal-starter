@@ -11,7 +11,7 @@ import idl from './idl.json';
 import kp from './keypair.json';
 
 // SystemProgram is a reference to the Solana runtime!
-const { SystemProgram, Keypair } = web3;
+const { SystemProgram } = web3;
 
 // Create a keypair for the account that will hold the GIF data.
 const arr = Object.values(kp._keypair.secretKey);
@@ -32,12 +32,6 @@ const opts = {
 // Constants
 const TWITTER_HANDLE = '_buildspace';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
-const TEST_GIFS = [
-	'https://media.giphy.com/media/33zX3zllJBGY8/giphy.gif',
-	'https://media.giphy.com/media/14uXQbPS73Y3qU/giphy.gif',
-	'https://media.giphy.com/media/kreQ1pqlSzftm/giphy.gif',
-	'https://media.giphy.com/media/f4HpCDvF84oh2/giphy.gif'
-]
 
 const App = () => {
   // State
@@ -225,7 +219,7 @@ const App = () => {
       console.log('Fetching GIF list...');
       getGifList();
     }
-  }, [walletAddress]);
+  });
 
   return (
     <div className="App">
