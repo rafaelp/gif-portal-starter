@@ -8,12 +8,15 @@ import {
 } from '@project-serum/anchor';
 
 import idl from './idl.json';
+import kp from './keypair.json';
 
 // SystemProgram is a reference to the Solana runtime!
 const { SystemProgram, Keypair } = web3;
 
 // Create a keypair for the account that will hold the GIF data.
-let baseAccount = Keypair.generate();
+const arr = Object.values(kp._keypair.secretKey);
+const secret = new Uint8Array(arr);
+const baseAccount = web3.Keypair.fromSecretKey(secret);
 
 // Get our program's id form the IDL file.
 const programID = new PublicKey(idl.metadata.address);
@@ -89,10 +92,25 @@ const App = () => {
   };
 
   const sendGif = async () => {
-    if (inputValue.length > 0) {
-      console.log('Gif link:', inputValue);
-    } else {
-      console.log('Empty input. Try again.');
+    if (inputValue.length === 0) {
+      console.log("No gif link given!")
+      return
+    }
+    console.log('Gif link:', inputValue);
+    try {
+      const provider = getProvider();
+      const program = new Program(idl, programID, provider);
+
+      await program.rpc.addGif(inputValue, {
+        accounts: {
+          baseAccount: baseAccount.publicKey,
+        },
+      });
+      console.log("GIF sucesfully sent to program", inputValue)
+
+      await getGifList();
+    } catch (error) {
+      console.log("Error sending GIF:", error)
     }
   };
 
@@ -145,8 +163,8 @@ const App = () => {
           <button className="cta-button submit-gif-button" onClick={sendGif}>Submit</button>
           <div className="gif-grid">
             {gifList.map((gif) => (
-              <div className="gif-item" key={gif}>
-                <img src={gif} alt={gif} />
+              <div className="gif-item" key={gif.gifLink}>
+                <img src={gif.gifLink} alt={gif.gifLink} />
               </div>
             ))}
           </div>
